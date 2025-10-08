@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kisan Shikshan Prasarak Mandal's Chh. Shivajiraje Mahavidyalaya, Udgir </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a56db; /* Deep Blue for professionalism */
+            --secondary-color: #3b82f6; /* Lighter Blue for accents */
+            --text-color: #1f2937;
+            --bg-color: #f9fafb;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .text-primary { color: var(--primary-color); }
+        .bg-primary { background-color: var(--primary-color); }
+        .hover-bg-secondary:hover { background-color: var(--secondary-color); }
+        .shadow-custom { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+
+        /* Dropdown transition */
+        .dropdown-menu {
+            transition: all 0.3s ease-out;
+            transform: translateY(-10px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .dropdown:hover .dropdown-menu {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* Gallery Hover Effect (Kept for future use, though the view is removed) */
+        .gallery-image-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+        }
+        .gallery-image-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            filter: brightness(1.1);
+        }
+
+        /* Content Fade In Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        /* --- DYNAMIC BACKGROUND SLIDESHOW STYLES (FULL SCREEN) --- */
+        .hero-slideshow {
+            /* Full viewport height (minus sticky header) */
+            height: calc(100vh - 96px); 
+            min-height: 500px;
+            width: 100vw; /* Ensure it is full screen width */
+            margin-left: calc(50% - 50vw); /* Trick to make it span full width out of a max-width container if needed */
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+            /* 5 images * 5 seconds each = 25s loop */
+            animation: slideShow 25s infinite; 
+        }
+
+        /* Define the keyframes for the image change */
+        @keyframes slideShow {
+            0% { background-image: url('./assests/shivaji\ front.jpeg'); }
+            20% { background-image: url('./assests/principal.jpg'); }
+            40% { background-image: url('./assests/slideshow.jpeg'); }
+            60% { background-image: url('./assests/slideshow\ 3.jpeg'); }
+            80% { background-image: url('./assests/slideshow\ 5.jpeg'); }
+            100% { background-image: url('./assests/Maino.avif'); } /* Loop back */
+        }
+        
+        /* DVV Table Styling */
+        .fees-table th, .fees-table td {
+            padding: 12px 24px;
+            text-align: left;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .fees-table th {
+            background-color: #f9fafb;
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 600; /* font-semibold */
+            color: #4b5563; /* text-gray-700 */
+            text-transform: uppercase;
+        }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // Removed: getFirestore, collection, onSnapshot, Timestamp as Notice Board is removed.
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        
+        setLogLevel('Debug');
+
+        let db;
+        let auth;
+        let appId;
+        let userId;
+
+        // --- Core Firebase Initialization and Authentication (Kept in case of future use) ---
+        const initFirebase = async () => {
+            try {
+                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-bca-app-id';
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                userId = auth.currentUser?.uid || crypto.randomUUID();
+                console.log("Firebase initialized. User ID:", userId);
+
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+            }
+        };
+
+        // --- SPA Routing/Navigation Logic (Kept) ---
+        window.navigateTo = (viewId) => {
+            const views = document.querySelectorAll('.content-view');
+            views.forEach(view => {
+                view.classList.add('hidden');
+                view.classList.remove('animate-fadeIn');
+            });
+
+            if (viewId === 'contact-footer') {
+                document.getElementById('contact-footer').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('home-view').classList.remove('hidden');
+                return;
+            }
+
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.classList.remove('hidden');
+                targetView.classList.add('animate-fadeIn');
+                window.scrollTo(0, 0);
+            }
+        };
+
+        // --- Initialization Handler ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initFirebase();
+            // Removed: setupSlideshowControl();
+
+            // Initial view load
+            navigateTo('home-view');
+        });
+
+        // Toggle mobile menu
+        window.toggleMenu = () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        };
+    </script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="sticky top-0 z-50 shadow-lg bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-24">
+                <a href="#" onclick="navigateTo('home-view')" class="flex-shrink-0 flex items-center">
+                    <img src="./assests/logo.png"College Logo" class="h-16 w-16 mr-3">
+                    <div>
+                        <div class="text-xs font-semibold text-gray-500 hidden sm:block">Kisan Shikshan Prasarak Mandal's</div>
+                        <div class="text-xl font-extrabold text-primary tracking-tight">Chhatrapati Shivajiraje Mahavidyalaya, Udgir</div>
+                   
+                    </div>
+                </a>
+
+                <nav class="hidden md:block">
+                    <div class="flex space-x-1">
+                        <a href="#" onclick="navigateTo('home-view')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md font-medium transition duration-150">Home</a>
+
+                        <div class="relative dropdown">
+                            <button class="text-gray-700 hover:text-primary px-3 py-2 rounded-md font-medium transition duration-150 flex items-center">
+                                Institute
+                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div class="dropdown-menu absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                                <a href="#" onclick="navigateTo('about-us-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-md">About us</a>
+                                <a href="#" onclick="navigateTo('governance-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Governance</a>
+                                <a href="#" onclick="navigateTo('institute-profile-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Institute Profile</a>
+                                <a href="#" onclick="navigateTo('notices-institute-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-md">Notices (Institute)</a>
+                            </div>
+                        </div>
+
+                        <div class="relative dropdown">
+                            <button class="text-gray-700 hover:text-primary px-3 py-2 rounded-md font-medium transition duration-150 flex items-center">
+                                Department
+                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div class="dropdown-menu absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                                <a href="#" onclick="navigateTo('bca-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-md">BCA</a>
+                                <a href="#" onclick="navigateTo('bcs-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">BCS</a>
+                                <a href="#" onclick="navigateTo('fees-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Fees Structure</a>
+                                <a href="#" onclick="navigateTo('timetable-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Time Table</a>
+                                <a href="#" onclick="navigateTo('admission-process-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-md">Admission Process</a>
+                            </div>
+                        </div>
+
+                        <div class="relative dropdown">
+                            <button class="text-gray-700 hover:text-primary px-3 py-2 rounded-md font-medium transition duration-150 flex items-center">
+                                Information For
+                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div class="dropdown-menu absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                                <a href="#" onclick="navigateTo('faculty-staff-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-md">Faculty and Staff</a>
+                                <a href="#" onclick="navigateTo('committees-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Committees/Cell</a>
+                                <a href="#" onclick="navigateTo('pdf-links-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Syllabus & Scholarship</a>
+                                <a href="#" onclick="navigateTo('research-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Research</a>
+                                <a href="#" onclick="navigateTo('curricula-view')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-md">Academic Curricula</a>
+                            </div>
+                        </div>
+
+                        <a href="#contact-footer" onclick="navigateTo('contact-footer')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md font-medium transition duration-150">Contact</a>
+                    </div>
+                </nav>
+
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMenu()" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="md:hidden hidden absolute w-full bg-white shadow-xl z-40" id="mobile-menu">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#" onclick="navigateTo('home-view'); toggleMenu();" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-primary border-b border-gray-100">Home</a>
+
+                <details class="group">
+                    <summary class="flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-primary cursor-pointer">
+                        Institute
+                        <svg class="w-5 h-5 group-open:rotate-180 transition duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="pl-6 pt-1 space-y-1">
+                        <a href="#" onclick="navigateTo('about-us-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">About us</a>
+                        <a href="#" onclick="navigateTo('governance-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">Governance</a>
+                        <a href="#" onclick="navigateTo('institute-profile-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">Institute Profile</a>
+                        <a href="#" onclick="navigateTo('notices-institute-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">Notices </a>
+                    </div>
+                </details>
+                
+                <details class="group">
+                    <summary class="flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-primary cursor-pointer">
+                        Department
+                        <svg class="w-5 h-5 group-open:rotate-180 transition duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="pl-6 pt-1 space-y-1">
+                        <a href="#" onclick="navigateTo('bca-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">BCA</a>
+                        <a href="#" onclick="navigateTo('bcs-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">BCS</a>
+                        <a href="#" onclick="navigateTo('fees-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">Fees Structure</a>
+                        <a href="#" onclick="navigateTo('timetable-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">Time Table</a>
+                        <a href="#" onclick="navigateTo('admission-process-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">Admission Process</a>
+                    </div>
+                </details>
+
+                <details class="group">
+                    <summary class="flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-primary cursor-pointer">
+                        Information For
+                        <svg class="w-5 h-5 group-open:rotate-180 transition duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="pl-6 pt-1 space-y-1">
+                        <a href="#" onclick="navigateTo('faculty-staff-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">Faculty and Staff</a>
+                        <a href="#" onclick="navigateTo('committees-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">Committees/Cell</a>
+                        <a href="#" onclick="navigateTo('pdf-links-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">Syllabus & Scholarship</a>
+                        <a href="#" onclick="navigateTo('research-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">Research</a>
+                        <a href="#" onclick="navigateTo('curricula-view'); toggleMenu();" class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md">Academic Curricula</a>
+                    </div>
+                </details>
+
+                <a href="#contact-footer" onclick="navigateTo('contact-footer'); toggleMenu();" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">Contact</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        
+        <div id="home-view" class="content-view py-0 md:py-0">
+            
+            <div class="hero-slideshow relative shadow-xl mb-8">
+                <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center p-8">
+                    <div class="text-center">
+                        <h1 class="text-5xl font-extrabold text-white mb-4 shadow-text">Welcome to Chhatrapati Shivajiraje Mahavidyalaya
+</h1>
+                        <p class="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">Empowering the next generation of IT professionals with innovative curriculum and cutting-edge facilities.</p>
+                        <a href="#" onclick="navigateTo('admission-process-view')" class="bg-secondary text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-primary transition duration-300 transform hover:scale-105 inline-flex items-center">
+                            Admissions Open 2024-25
+                            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                
+                <div class="bg-white p-6 rounded-lg shadow-xl grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-2xl font-bold text-primary mb-3 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v18m-7-6h14"></path></svg>
+                            Our Vision
+                        </h3>
+                        <p class="text-gray-600">To  be  the  most  trusted  and  chosen  education  provider  of  the  region  through  sincere  teaching  and providing excellent educational infrastructure  to empower masses.
+                            “Quality Education for the advancement of the masses.”
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-primary mb-3 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.165-1.196-.475-1.637C15.86 16.273 14.896 16 12 16c-2.896 0-3.86.273-4.525.504-.31.44-.475.984-.475 1.637v2m-2-2h-5v-2a3 3 0 015.356-1.857M5 20h2m-2 0H3m2-4v2M3 16v2m16-4v2m-2-2h-5m-14 0h5m14 0h-5m-5.414-9.586a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5z"></path></svg>
+                            Principal's Message
+                        </h3>
+                        <p class="text-gray-600">"Dear Parents, students and well-wishers, greetings from SMU family. First and foremost, I would like to express my heartfelt gratitude to each and every one of you for your unwavering encouragement, affection, and concern for the college, which enables and stimulates us to work hard to carry out our mission statement- “Quality Education for the Advancement of the Masses.”" - <span class="font-semibold text-primary">Dr. Ramkishan M. Manjre  (M.A., Ph.D)</span></p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-xl">
+                    <h3 class="text-2xl font-bold text-primary mb-4">Key Highlights</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <div class="p-3 bg-gray-50 rounded-lg shadow-md">
+                            <p class="text-3xl font-extrabold text-secondary">200+</p>
+                            <p class="text-sm text-gray-600">Active Students</p>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded-lg shadow-md">
+                            <p class="text-3xl font-extrabold text-secondary">A+ Grade</p>
+                            <p class="text-sm text-gray-600">NAAC A+ Accreditation</p>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded-lg shadow-md">
+                            <p class="text-3xl font-extrabold text-secondary">Carrer</p>
+                            <p class="text-sm text-gray-600">Excellent Career Transition</p>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded-lg shadow-md">
+                            <p class="text-3xl font-extrabold text-secondary">Lab</p>
+                            <p class="text-sm text-gray-600">Modern Labs</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-lg shadow-xl border-t-4 border-primary">
+                    <h3 class="text-3xl font-extrabold text-primary mb-4">Why Join Shivaji Mahavidyalaya?</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-gray-700">
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-secondary flex-shrink-0 mt-1 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.103a9 9 0 11-12.625 12.625 9 9 0 0112.625-12.625z"></path></svg>
+                            <p class="font-medium">Highly Experienced and Qualified Faculty</p>
+                        </div>
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-secondary flex-shrink-0 mt-1 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.103a9 9 0 11-12.625 12.625 9 9 0 0112.625-12.625z"></path></svg>
+                            <p class="font-medium">Practice-oriented learning</p>
+                        </div>
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-secondary flex-shrink-0 mt-1 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.103a9 9 0 11-12.625 12.625 9 9 0 0112.625-12.625z"></path></svg>
+                            <p class="font-medium">Emphasis on research</p>
+                        </div>
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-secondary flex-shrink-0 mt-1 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.103a9 9 0 11-12.625 12.625 9 9 0 0112.625-12.625z"></path></svg>
+                            <p class="font-medium">Strong Foundation for Higher Studies</p>
+                        </div>
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-secondary flex-shrink-0 mt-1 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.103a9 9 0 11-12.625 12.625 9 9 0 0112.625-12.625z"></path></svg>
+                            <p class="font-medium">Excellent peer group</p>
+                        </div>
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-secondary flex-shrink-0 mt-1 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.103a9 9 0 11-12.625 12.625 9 9 0 0112.625-12.625z"></path></svg>
+                            <p class="font-medium">Diverse Course Offerings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="py-12">
+                    <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Campus Facilities</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        
+                        <div class="facility-card bg-white rounded-lg shadow-xl">
+                            <img src="./assests/lab.jpeg" alt="Modern Computer Lab" class="w-full h-48 object-cover rounded-t-lg">
+                            <div class="p-4">
+                                <h3 class="text-xl font-bold text-primary">Computer Labs</h3>
+                                <p class="text-gray-600 text-sm mt-1">10 specialized labs with over 300 modern, networked PCs, dedicated to programming, networking, and project development.</p>
+                            </div>
+                        </div>
+
+                        <div class="facility-card bg-white rounded-lg shadow-xl">
+                            <img src="./assests/lib.avif" alt="Central Library" class="w-full h-48 object-cover rounded-t-lg">
+                            <div class="p-4">
+                                <h3 class="text-xl font-bold text-primary">Library</h3>
+                                <p class="text-gray-600 text-sm mt-1">Vast collection of IT books, journals, e-resources, and a peaceful reading environment with a digital library section.</p>
+                            </div>
+                        </div> 
+
+                        <div class="facility-card bg-white rounded-lg shadow-xl">
+                            <img src="./assests/sporttt.jpeg" alt="Sports Grounds" class="w-full h-48 object-cover rounded-t-lg">
+                            <div class="p-4">
+                                <h3 class="text-xl font-bold text-primary">Sports</h3>
+                                <p class="text-gray-600 text-sm mt-1">Facilities for indoor and outdoor sports including Cricket, Volleyball, and Chess, promoting overall student fitness.</p>
+                            </div>
+                        </div> 
+
+                        <div class="facility-card bg-white rounded-lg shadow-xl">
+                            <img src="./assests/audddit.jpeg" alt="Seminar Hall" class="w-full h-48 object-cover rounded-t-lg">
+                            <div class="p-4">
+                                <h3 class="text-xl font-bold text-primary">Seminar Hall</h3>
+                                <p class="text-gray-600 text-sm mt-1">Fully equipped hall with audiovisual facilities for conferences, workshops, and placement drives.</p>
+                            </div>
+                        </div> 
+
+                        <div class="facility-card bg-white rounded-lg shadow-xl">
+                            <img src="./assests/Exhibition.jpeg" alt="Exhibition" class="w-full h-48 object-cover rounded-t-lg">
+                            <div class="p-4">
+                                <h3 class="text-xl font-bold text-primary">Exhibition</h3>
+                                <p class="text-gray-600 text-sm mt-1">Dedicated space for various Science and Tech Events, projects, and department exhibitions.</p>
+                            </div>
+                        </div> 
+                        
+                        <div class="facility-card bg-white rounded-lg shadow-xl">
+                            <img src="./assests/audddit.jpeg" alt="College Cafeteria" class="w-full h-48 object-cover rounded-t-lg">
+                            <div class="p-4">
+                                <h3 class="text-xl font-bold text-primary">Auditorium</h3>
+                                <p class="text-gray-600 text-sm mt-1">Our state-of-the-art, fully-equipped auditorium provides a dynamic venue for all major academic, cultural, and corporate events.</p>
+                            </div>
+                        </div> 
+
+                        <div class="facility-card bg-white rounded-lg shadow-xl">
+                            <img src="./assests/hostel.jpeg" alt="Hostel Building" class="w-full h-48 object-cover rounded-t-lg">
+                            <div class="p-4">
+                                <h3 class="text-xl font-bold text-primary">Hostel Accommodation</h3>
+                                <p class="text-gray-600 text-sm mt-1">Separate, secure, and well-maintained hostel facilities for both male and female students.</p>
+                            </div>
+                        </div> 
+
+                        <div class="facility-card bg-white rounded-lg shadow-xl">
+                            <img src="./assests/cult.jpeg" alt="Medical Unit" class="w-full h-48 object-cover rounded-t-lg">
+                            <div class="p-4">
+                                <h3 class="text-xl font-bold text-primary">Cultural</h3>
+                                <p class="text-gray-600 text-sm mt-1">Various Annual Fest in Our College takes place.</p>
+                            </div>
+                        </div> 
+                        
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="about-us-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">About Our Institution</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-6">
+                    <p class="text-lg text-gray-700">
+
+                        Shivaji Mahavidyalaya is a recognized center for higher education, founded with a missionary zeal to advance educationally backward communities in the economically and socially developing region near the Maharashtra, Karnataka, and Andhra borders. The college offers 18 diverse academic programs across Arts, Commerce, Science, and a Computer-based professional course, enrolling over 1600 students in its regular program. With a large campus, dedicated and highly qualified faculty(including 27 Ph.D. holders and 7 research guides), and a strong focus on research and community service(NSS, NCC, Earn and Learn scheme), the institution is committed to providing quality, holistic education for the advancement and betterment of the masses, as reflected by its NAAC A+ grade accreditation.</p>
+
+                    <h3 class="text-2xl font-semibold text-secondary pt-4">Our Values</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2 pl-4">
+                        <li>Integrity: Upholding the highest standards of academic honesty and ethical conduct.</li>
+                        <li>Innovation: Encouraging creative thinking and adoption of new technologies.</li>
+                        <li>Excellence: Striving for quality in teaching, research, and administration.</li>
+                        <li>Inclusivity:Providing equal opportunities and a supportive environment for all students.</li>
+                    </ul>
+
+                    <h3 class="text-2xl font-semibold text-secondary pt-4">College History</h3>
+                    <p class="text-gray-700">Starting with a handful of traditional courses, the college grew rapidly, recognizing the need for technical education. The introduction of the Bachelor of Computer Applications (BCA) and Bachelor of Computer Science (BCS) programs marked a significant milestone, aligning the institution with the demands of the modern workforce. We continue to adapt our curriculum to stay ahead of industry trends.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="governance-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Governance and Administration</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-6">
+                    <p class="text-lg text-gray-700">The college is governed by a dedicated board of management that ensures academic autonomy, financial stability, and adherence to regulatory guidelines. The Principal, supported by department heads and administrative staff, oversees the day-to-day operations.</p>
+                    
+                    <h3 class="text-2xl font-semibold text-secondary pt-4">Key Governing Bodies</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2 pl-4">
+                        <li>Management Council: Provides strategic direction and financial oversight.</li>
+                        <li>Academic Council: Responsible for curriculum design, teaching methods, and academic quality assurance.</li>
+                        <li>Internal Quality Assurance Cell (IQAC):Monitors and evaluates the overall institutional performance.</li>
+                    </ul>
+
+                    <h3 class="text-2xl font-semibold text-secondary pt-4">Organizational Structure</h3>
+                    <p class="text-gray-700">The structure promotes transparency and accountability, ensuring all decisions are student-centric. The BCA and BCS departments report directly to the Principal, facilitating quick implementation of program improvements and initiatives.</p>
+
+                    <a href="https://example.com/governance-chart.pdf" target="_blank" class="text-primary font-semibold hover:text-secondary inline-flex items-center mt-4">
+                        View Organizational Chart (PDF)
+                        <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="institute-profile-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Institute Profile</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-6">
+                    <h3 class="text-2xl font-semibold text-secondary mb-4">Highlights</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-4 border-l-4 border-primary bg-gray-50 rounded-md">
+                            <p class="font-bold text-lg text-primary">Affiliation</p>
+                            <p class="text-gray-700">Affiliated to SRTM University</p>
+                        </div>
+                        <div class="p-4 border-l-4 border-primary bg-gray-50 rounded-md">
+                            <p class="font-bold text-lg text-primary">Accreditation</p>
+                            <p class="text-gray-700"> Accredited by NAAC with 3.27 A+ Accorded UGC 2(f)&12(B)</p>
+                        </div>
+                        <div class="p-4 border-l-4 border-primary bg-gray-50 rounded-md">
+                            <p class="font-bold text-lg text-primary">Established</p>
+                            <p class="text-gray-700">College: 1995, IT Departments: 2005</p>
+                        </div>
+                        <div class="p-4 border-l-4 border-primary bg-gray-50 rounded-md">
+                            <p class="font-bold text-lg text-primary">Student Strength (IT)</p>
+                            <p class="text-gray-700">~200 Students</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-2xl font-semibold text-secondary pt-6">Institutional Distinctiveness</h3>
+                    <p class="text-gray-700">Our distinctiveness lies in our strong emphasis on practical skills development, industry collaboration, and promoting local entrepreneurship in IT. We maintain state-of-the-art computer labs and provide mandatory project-based learning in every semester.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="notices-institute-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Institute Notices & Announcements</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl">
+                    <p class="text-lg text-gray-700 mb-6">This section lists all general notices, circulars, and announcements from the college administration and various committees.</p>
+                    <ul class="space-y-4">
+                        <li class="p-4 bg-gray-50 border-l-4 border-red-500 rounded-md shadow-sm flex justify-between items-center">
+                            <div>
+                                <p class="text-xs text-gray-500">October 1, 2024</p>
+                                <p class="font-bold text-lg text-red-600">Urgent: Internal Assessment Marks Submission</p>
+                                <p class="text-gray-700 text-sm">All faculty must submit internal assessment marks for odd semester by Oct 10, 2024.</p>
+                            </div>
+                            <a href="https://example.com/notices/internal-assessment-oct-2024.pdf" target="_blank" class="text-primary hover:text-secondary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="bca-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Bachelor of Computer Applications (BCA)</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-6">
+                    <h3 class="text-2xl font-semibold text-secondary mb-4">Program Overview</h3>
+                    <p class="text-gray-700">The BCA program is a three-year, full-time undergraduate course designed to provide students with a strong theoretical and practical foundation in computer applications. It prepares students for careers in software development, system management, and IT consulting.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center pt-4">
+                        <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
+                            <p class="text-xl font-bold text-primary">Duration</p>
+                            <p class="text-gray-700">3 Years (6 Semesters)</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
+                            <p class="text-xl font-bold text-primary">Eligibility</p>
+                            <p class="text-gray-700">H.S.C. (10+2) or equivalent</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
+                            <p class="text-xl font-bold text-primary">Intake</p>
+                            <p class="text-gray-700">60 Seats</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-2xl font-semibold text-secondary pt-6">Career Prospects</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2 pl-4">
+                        <li>Software Developer/Engineer</li>
+                        <li>Web Developer</li>
+                        <li>Database Administrator</li>
+                        <li>System Analyst</li>
+                        <li>Network Administrator</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="bcs-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Bachelor of Computer Science (BCS)</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-6">
+                    <h3 class="text-2xl font-semibold text-secondary mb-4">Program Overview</h3>
+                    <p class="text-gray-700">The BCS program is an intensive three-year degree focusing on the theoretical foundations of computer science, mathematics, and programming. It is ideal for students aiming for advanced studies (like MCA/MSc) or research-oriented roles.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center pt-4">
+                        <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
+                            <p class="text-xl font-bold text-primary">Duration</p>
+                            <p class="text-gray-700">3 Years (6 Semesters)</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
+                            <p class="text-xl font-bold text-primary">Eligibility</p>
+                            <p class="text-gray-700">H.S.C. (10+2) or equivalent</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
+                            <p class="text-xl font-bold text-primary">Intake</p>
+                            <p class="text-gray-700">60 Seats</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-2xl font-semibold text-secondary pt-6">Career Prospects</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2 pl-4">
+                        <li>Higher Education (MCA, MSc IT/CS)</li>
+                        <li>Software Tester/QA Analyst</li>
+                        <li>Data Scientist (Entry Level)</li>
+                        <li>IT Trainer/Educator</li>
+                        <li>Research Assistant</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="fees-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Fees Structure (2024-25 Academic Year)</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl overflow-x-auto">
+                    <p class="text-lg text-gray-700 mb-6">The following table outlines the fee structure for the BCA and BCS programs. Note that scholarship/fee-waiver schemes are applicable as per government norms (e.g., EBC/SC/ST/OBC).</p>
+
+                    <table class="min-w-full fees-table bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr>
+                                <th class="py-3 px-6 text-sm font-semibold text-gray-700 uppercase tracking-wider">Particulars</th>
+                                <th class="py-3 px-6 text-sm font-semibold text-gray-700 uppercase tracking-wider">BCA (Per Year)</th>
+                                <th class="py-3 px-6 text-sm font-semibold text-gray-700 uppercase tracking-wider">BCS (Per Year)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="py-4 px-6 font-medium text-gray-900">Tuition Fee</td>
+                                <td class="py-4 px-6 text-gray-700">₹ 25,000</td>
+                                <td class="py-4 px-6 text-gray-700">₹ 22,000</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 px-6 font-medium text-gray-900">Development Fee</td>
+                                <td class="py-4 px-6 text-gray-700">₹ 3,000</td>
+                                <td class="py-4 px-6 text-gray-700">₹ 3,000</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 px-6 font-medium text-gray-900">Exam Fee (University)</td>
+                                <td class="py-4 px-6 text-gray-700">₹ 2,000</td>
+                                <td class="py-4 px-6 text-gray-700">₹ 2,000</td>
+                            </tr>
+                            <tr class="bg-gray-50 font-extrabold text-primary">
+                                <td class="py-4 px-6">Total Fee (Approx.)</td>
+                                <td class="py-4 px-6">₹ 30,000</td>
+                                <td class="py-4 px-6">₹ 27,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="mt-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-md">
+                        <p class="font-semibold">Note:</p>
+                        <p class="text-sm">Fees for reserved categories (SC/ST/OBC/VJNT) are subject to government scholarship schemes and university norms, potentially reducing the net fee significantly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="timetable-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Academic Time Table</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-6">
+                    <p class="text-lg text-gray-700 mb-6">Download the latest Odd Semester (Sem I, III, V) time tables here:</p>
+                    
+                    <ul class="space-y-4">
+                        <li class="p-4 bg-gray-50 border-l-4 border-primary rounded-md shadow-sm flex justify-between items-center">
+                            <p class="font-bold text-lg text-primary">BCA Time Table (Odd Sem)</p>
+                            <a href="https://example.com/timetable/bca-odd-sem-2024.pdf" target="_blank" class="text-primary hover:text-secondary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </a>
+                        </li>
+                        <li class="p-4 bg-gray-50 border-l-4 border-primary rounded-md shadow-sm flex justify-between items-center">
+                            <p class="font-bold text-lg text-primary">BCS Time Table (Odd Sem)</p>
+                            <a href="https://example.com/timetable/bcs-odd-sem-2024.pdf" target="_blank" class="text-primary hover:text-secondary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <p class="text-lg text-gray-700 pt-6 mb-6">Download the latest Even Semester (Sem II, IV, VI) time tables here:</p>
+                    <ul class="space-y-4">
+                        <li class="p-4 bg-gray-50 border-l-4 border-secondary rounded-md shadow-sm flex justify-between items-center">
+                            <p class="font-bold text-lg text-primary">BCA Time Table (Even Sem)</p>
+                            <a href="https://example.com/timetable/bca-even-sem-2025.pdf" target="_blank" class="text-primary hover:text-secondary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </a>
+                        </li>
+                        <li class="p-4 bg-gray-50 border-l-4 border-secondary rounded-md shadow-sm flex justify-between items-center">
+                            <p class="font-bold text-lg text-primary">BCS Time Table (Even Sem)</p>
+                            <a href="https://example.com/timetable/bcs-even-sem-2025.pdf" target="_blank" class="text-primary hover:text-secondary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="admission-process-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Admission Process (2024-25)</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-8">
+                    <p class="text-lg text-gray-700">Follow these simple steps to secure your admission into the BCA or BCS program for the academic year 2024-25:</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl mr-4 shadow-md">1</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-primary mb-1">Online Pre-Registration</h3>
+                                <p class="text-gray-700">Fill out the mandatory online pre-registration form. Upload necessary preliminary documents (Mark sheets, ID Proof).</p>
+                                <a href="https://example.com/apply-preregistration" target="_blank" class="text-secondary font-semibold hover:text-primary transition duration-150 inline-block mt-2">
+                                    Go to Pre-Registration Portal
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl mr-4 shadow-md">2</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-primary mb-1">Document Verification & Counseling</h3>
+                                <p class="text-gray-700">Visit the college for physical document verification and a short counseling session with the HOD.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl mr-4 shadow-md">3</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-primary mb-1">Fee Payment</h3>
+                                <p class="text-gray-700">Pay the required academic fees (can be done online or offline at the college counter).</p>
+                                </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl mr-4 shadow-md">4</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-primary mb-1">Confirmation & Enrollment</h3>
+                                <p class="text-gray-700">Receive the final admission confirmation letter and your student ID, marking your official enrollment.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-gray-50 border-l-4 border-secondary rounded-lg">
+                        <h3 class="text-xl font-bold text-secondary mb-2">Required Documents:</h3>
+                        <ul class="list-disc list-inside text-gray-700 pl-4">
+                            <li>10th and 12th Mark Sheet (Original and 2 copies)</li>
+                            <li>Leaving Certificate/Transfer Certificate (Original)</li>
+                            <li>Caste Certificate (if applicable)</li>
+                            <li>Gap Certificate (if applicable)</li>
+                            <li>Aadhaar Card and 4 Passport Size Photos</li>
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div id="pdf-links-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Syllabus & Scholarship PDF Downloads</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-6">
+                    <h3 class="text-2xl font-semibold text-secondary mb-4">Academic Syllabi (Latest CBCS)</h3>
+                    <ul class="space-y-4">
+                        <li class="p-4 bg-gray-50 border-l-4 border-primary rounded-md shadow-sm flex justify-between items-center">
+                            <p class="font-bold text-lg text-primary">BCA Syllabus (BCS 2024-25)</p>
+                            <a href="https://example.com/syllabus/bca-cbcs-2024.pdf" target="_blank" class="text-primary hover:text-secondary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </a>
+                        </li>
+                        <li class="p-4 bg-gray-50 border-l-4 border-primary rounded-md shadow-sm flex justify-between items-center">
+                            <p class="font-bold text-lg text-primary">BCS Syllabus (BCS 2024-25)</p>
+                            <a href="https://example.com/syllabus/bcs-cbcs-2024.pdf" target="_blank" class="text-primary hover:text-secondary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </a>
+                        </li>
+                    </ul>
+
+                   
+
+                    <h3 class="text-2xl font-semibold text-secondary mt-8 mb-4">Scholarship Documents</h3>
+                    <ul class="space-y-4">
+                        <li class="p-4 bg-gray-50 border-l-4 border-primary rounded-md shadow-sm flex justify-between items-center">
+                            <p class="font-bold text-lg text-primary">Govt. Scholarship Application Guidelines (2024-25)</p>
+                            <a href="https://example.com/scholarship/scholarship-guide-2024.pdf" target="_blank" class="text-primary hover:text-secondary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </a>
+                        </li>
+                        <li class="p-4 bg-gray-50 border-l-4 border-primary rounded-md shadow-sm flex justify-between items-center">
+                            <p class="font-bold text-lg text-primary">EBC/Freeship Application Form</p>
+                            <a href="https://example.com/scholarship/ebc-form.pdf" target="_blank" class="text-primary hover:text-secondary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="faculty-staff-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Faculty and Staff</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-6">
+                    <h3 class="text-2xl font-semibold text-secondary mb-4">Core Faculty - BCA/BCS Department</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                        <div class="bg-gray-50 rounded-lg p-4 text-center shadow-md border-t-4 border-primary">
+                            <img src="./assests/hod.png" alt="Dr. A. B. Patil" class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-primary">
+                            <p class="font-bold text-lg text-primary">Dr. </p>
+                            <p class="text-sm text-secondary font-semibold">Head of Department (HOD)</p>
+                            <p class="text-xs text-gray-500 mt-1">Ph.D. (CS), M.Tech. (IT)</p>
+                            <p class="text-xs text-gray-500 mt-1">Experience: 15+ Years</p>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-lg p-4 text-center shadow-md">
+                            <img src="./assests/fac1.jpeg" alt="Prof. S. N. Kulkarni" class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-gray-200">
+                            <p class="font-bold text-lg text-primary">Prof. S. N. Kulkarni</p>
+                            <p class="text-sm text-gray-600 font-semibold">Assistant Professor</p>
+                            <p class="text-xs text-gray-500 mt-1">M.Sc. (CS), NET Qualified</p>
+                            <p class="text-xs text-gray-500 mt-1">Specialization: Data Structures</p>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 text-center shadow-md">
+                            <img src="./assests/fac2.jpeg" alt="Prof. R. P. Deshmukh" class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-gray-200">
+                            <p class="font-bold text-lg text-primary">Prof. R. P. Deshmukh</p>
+                            <p class="text-sm text-gray-600 font-semibold">Assistant Professor</p>
+                            <p class="text-xs text-gray-500 mt-1">M.C.A., M.Phil.</p>
+                            <p class="text-xs text-gray-500 mt-1">Specialization: Web Technologies</p>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-lg p-4 text-center shadow-md">
+                            <img src="./assests/fac3.jpeg" alt="Prof. G. K. Shinde" class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-gray-200">
+                            <p class="font-bold text-lg text-primary">Prof. G. K. Shinde</p>
+                            <p class="text-sm text-gray-600 font-semibold">Assistant Professor</p>
+                            <p class="text-xs text-gray-500 mt-1">M.Sc. (IT)</p>
+                            <p class="text-xs text-gray-500 mt-1">Specialization: DBMS & SQL</p>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-lg p-4 text-center shadow-md">
+                            <img src="./assests/fac4.jpeg" alt="Prof. M. B. Shaikh" class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-gray-200">
+                            <p class="font-bold text-lg text-primary">Prof. M. B. Shaikh</p>
+                            <p class="text-sm text-gray-600 font-semibold">Assistant Professor</p>
+                            <p class="text-xs text-gray-500 mt-1">M.C.A.</p>
+                            <p class="text-xs text-gray-500 mt-1">Specialization: Operating Systems</p>
+                        </div>
+                        
+                    </div>
+
+                    <h3 class="text-2xl font-semibold text-secondary pt-6 mb-4">Administrative & Lab Staff</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-50 rounded-lg p-4 shadow-md border-l-4 border-secondary">
+                            <p class="font-bold text-lg text-primary">Mr. P. V. Jadhav</p>
+                            <p class="text-sm text-gray-600">Department Coordinator (BCA)</p>
+                            <p class="text-xs text-gray-500 mt-1">Key responsibilities: Admissions, Records</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4 shadow-md border-l-4 border-secondary">
+                            <p class="font-bold text-lg text-primary">Mr. A. N. More</p>
+                            <p class="text-sm text-gray-600">Senior Lab Assistant</p>
+                            <p class="text-xs text-gray-500 mt-1">Key responsibilities: Lab Maintenance, Network Support</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="committees-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Committees and Cells</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-8">
+                    <p class="text-lg text-gray-700">Various committees and cells are established to ensure smooth academic functioning, student welfare, and adherence to quality standards.</p>
+
+                    <div class="border p-6 rounded-lg shadow-sm border-l-4 border-red-500">
+                        <h3 class="text-xl font-bold text-red-600 mb-2 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Anti-Ragging Cell
+                        </h3>
+                        <p class="text-gray-700 text-sm mb-3">Ensures a safe and harassment-free environment for all students. Strict action is taken against any form of ragging.</p>
+                        <ul class="list-disc list-inside text-gray-600 text-sm pl-4">
+                            <li>Convener: Dr. A. B. Patil (HOD)</li>
+                            <li>Contact: anti.ragging@example.com</li>
+                        </ul>
+                    </div>
+
+                    <div class="border p-6 rounded-lg shadow-sm border-l-4 border-primary">
+                        <h3 class="text-xl font-bold text-primary mb-2 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.103a9 9 0 11-12.625 12.625 9 9 0 0112.625-12.625z"></path></svg>
+                            IQAC (Internal Quality Assurance Cell)
+                        </h3>
+                        <p class="text-gray-700 text-sm mb-3">Responsible for developing quality benchmarks for academic and administrative activities.</p>
+                        <ul class="list-disc list-inside text-gray-600 text-sm pl-4">
+                            <li>Coordinator: Prof. S. N. Kulkarni</li>
+                            <li>Focus: Curriculum review, student feedback, NAAC compliance.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="border p-6 rounded-lg shadow-sm border-l-4 border-secondary">
+                        <h3 class="text-xl font-bold text-secondary mb-2 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.864 23.864 0 0112 15.75c-2.35 0-4.646-.35-6.855-1.002.302-1.397.674-2.736 1.107-4.015L12 9l5.748 2.737c.433 1.28.805 2.618 1.107 4.015zm0 0l-4 4m4-4l-4-4"></path></svg>
+                            Training & Placement Cell
+                        </h3>
+                        <p class="text-gray-700 text-sm mb-3">Organizes industry training, workshops, and coordinates placement drives and career counseling.</p>
+                        <ul class="list-disc list-inside text-gray-600 text-sm pl-4">
+                            <li>Coordinator: Prof. R. P. Deshmukh</li>
+                            <li>Activities: Mock Interviews, Resume Building, Industry Tours.</li>
+                        </ul>
+                    </div>
+
+                    <div class="border p-6 rounded-lg shadow-sm border-l-4 border-gray-500">
+                        <h3 class="text-xl font-bold text-gray-700 mb-2 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v18m-7-6h14"></path></svg>
+                            Research and Development Cell
+                        </h3>
+                        <p class="text-gray-700 text-sm mb-3">Promotes and facilitates research activities among faculty and students, including project funding and paper publication.</p>
+                        <ul class="list-disc list-inside text-gray-600 text-sm pl-4">
+                            <li>Coordinator: Prof. G. K. Shinde</li>
+                            <li>Focus: Minor Research Projects, Publications, Patent Filing.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="research-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Research and Innovation</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-6">
+                    <p class="text-lg text-gray-700">The BCA and BCS departments actively encourage research, innovation, and project-based learning to foster a culture of inquiry and critical thinking among students and faculty.</p>
+
+                    <h3 class="text-2xl font-semibold text-secondary pt-4">Faculty Publications (Last 3 Years)</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2 pl-4">
+                        <li>"Comparative Analysis of Machine Learning Algorithms for Predictive Maintenance" - Dr. A. B. Patil (Scopus Indexed)</li>
+                        <li>"Implementing Blockchain in Supply Chain Management: A Security Perspective" - Prof. S. N. Kulkarni (UGC CARE Listed)</li>
+                        <li>"Developing a Low-Cost IoT System for Environmental Monitoring" - Prof. M. B. Shaikh</li>
+                    </ul>
+
+                    <h3 class="text-2xl font-semibold text-secondary pt-4">Student Research Projects</h3>
+                    <p class="text-gray-700">Mandatory final-year projects in both BCA and BCS often lead to innovative solutions, with several projects having been presented at university-level exhibitions.</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2 pl-4">
+                        <li>AI-Powered Chatbot for College Admissions</li>
+                        <li>Android Application for Local Bus Tracking</li>
+                        <li>E-Waste Management System using Web Technologies</li>
+                    </ul>
+
+                    <a href="https://example.com/research-policy.pdf" target="_blank" class="text-primary font-semibold hover:text-secondary inline-flex items-center mt-4">
+                        View College Research Policy (PDF)
+                        <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="curricula-view" class="content-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-primary mb-6 border-b-2 border-primary pb-2">Academic Curricula & Subjects</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl space-y-6">
+                    <h3 class="text-2xl font-semibold text-secondary mb-4">BCA Curriculum Structure (CBCS)</h3>
+                    <ul class="space-y-4 text-gray-700 pl-4">
+                        <li class="p-4 bg-gray-50 rounded-md border-l-4 border-primary">
+                            <p class="font-bold text-primary">Year I (Sem I & II):</p>
+                            <p class="text-sm">Introduction to Programming (C), Discrete Mathematics, Digital Electronics, Communication Skills, Operating System Fundamentals.</p>
+                        </li>
+                        <li class="p-4 bg-gray-50 rounded-md border-l-4 border-primary">
+                            <p class="font-bold text-primary">Year II (Sem III & IV):</p>
+                            <p class="text-sm">Data Structures, Object-Oriented Programming (C++), DBMS, Computer Networks, Software Engineering, Linux Administration.</p>
+                        </li>
+                        <li class="p-4 bg-gray-50 rounded-md border-l-4 border-primary">
+                            <p class="font-bold text-primary">Year III (Sem V & VI):</p>
+                            <p class="text-sm">Web Technology (PHP/Python), Java Programming, Data Science Fundamentals, Cloud Computing, Project Work & Internships.</p>
+                        </li>
+                    </ul>
+
+                    <h3 class="text-2xl font-semibold text-secondary pt-6 mb-4">BCS Curriculum Structure (CBCS)</h3>
+                    <ul class="space-y-4 text-gray-700 pl-4">
+                        <li class="p-4 bg-gray-50 rounded-md border-l-4 border-secondary">
+                            <p class="font-bold text-primary">Year I (Sem I & II):</p>
+                            <p class="text-sm">C Programming, Statistical Methods, Calculus, Computer Organization, Logic and Switching Theory.</p>
+                        </li>
+                        <li class="p-4 bg-gray-50 rounded-md border-l-4 border-secondary">
+                            <p class="font-bold text-primary">Year II (Sem III & IV):</p>
+                            <p class="text-sm">Advanced Data Structures, Python Programming, Database Management Systems, Computer Graphics, Operations Research.</p>
+                        </li>
+                        <li class="p-4 bg-gray-50 rounded-md border-l-4 border-secondary">
+                            <p class="font-bold text-primary">Year III (Sem V & VI):</p>
+                            <p class="text-sm">Advanced Java, Web Development, Software Testing, Distributed Computing, Research Project.</p>
+                        </li>
+                    </ul>
+
+                    <div class="mt-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-md">
+                        <p class="font-semibold">Electives:</p>
+                        <p class="text-sm">Students can choose from a range of skill-based and general electives, including courses on Mobile Application Development, Cyber Security, and Tally/Accounting.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer id="contact-footer" class="bg-gray-800 text-white pt-10 pb-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                
+                <div>
+                    <img src="./assests/logo.png" alt="College Logo White" class="h-16 w-16 mb-4 filter brightness-110">
+                    <p class="text-gray-400 text-sm">KSPM's Chhatrapati Shivajiraje Mahavidyalaya is committed to delivering quality technical education for the digital future.</p>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-3">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" onclick="navigateTo('home-view')" class="hover:text-primary transition duration-150">Home</a></li>
+                        <li><a href="#" onclick="navigateTo('about-us-view')" class="hover:text-primary transition duration-150">About Us</a></li>
+                        <li><a href="#" onclick="navigateTo('admission-process-view')" class="hover:text-primary transition duration-150">Admissions 2024-25</a></li>
+                        <li><a href="#" onclick="navigateTo('notices-institute-view')" class="hover:text-primary transition duration-150">Notices</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-3">Contact Us</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 mr-2 mt-1 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            Near Bus Stand, Udgir, Dist: Latur - 413 517 (M.S.)
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-9 13h9a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            Email: kspmcs@example.com
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                            Phone No. : 02385-256116, 9850757663
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-3">Explore</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" onclick="navigateTo('curricula-view')" class="hover:text-primary transition duration-150">Academic Curricula</a></li>
+                        <li><a href="#" onclick="navigateTo('pdf-links-view')" class="hover:text-primary transition duration-150">Syllabus & Scholarship</a></li>
+                        <li><a href="#" onclick="navigateTo('faculty-staff-view')" class="hover:text-primary transition duration-150">Faculty</a></li>
+                        <li><a href="#" onclick="navigateTo('research-view')" class="hover:text-primary transition duration-150">Research</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-10 pt-6 border-t border-gray-700 text-center">
+                <p class="text-sm text-gray-400">&copy; <span id="current-year">2024</span> KSPM's Chhatrapati Shivajiraje Mahavidyalaya, Udgir. All rights reserved. | Developed for Educational Purposes.</p>
+            </div>
+        </div>
+        <script>
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+        </script>
+    </footer>
+</body>
+</html>
